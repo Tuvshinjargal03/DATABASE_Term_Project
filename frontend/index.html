@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donation Transparency System</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="app">
+
+    <nav class="topnav">
+      <div class="nav-left">
+        <span class="logo">DTS</span>
+      </div>
+      <div class="nav-right">
+        <a href="#" onclick="showView('home-view');">Home</a>
+        <a href="#" onclick="showView('about-us-view');">About Us</a>
+      </div>
+    </nav>
+
+    <div class="view" id="home-view">
+      <div class="split-overlay">
+
+        <div class="split left">
+          <div class="split-content">
+            <h1>Hello, Friend!</h1>
+            <p>Already a member? Login and continue your journey.</p>
+            <button class="btn primary" onclick="showView('login-view')">Login</button>
+          </div>
+        </div>
+
+        <div class="split right">
+          <div class="split-content">
+            <h1>Welcome!</h1>
+            <p>New here? Join us and start donating transparently.</p>
+            <button class="btn primary" onclick="showView('signup-view')">Join Us</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="view hidden" id="about-us-view">
+      <div class="about-us">
+        <h2>About Donation Transparency System</h2>
+        <p>At <strong>DTS</strong>, we believe every donation deserves trust, clarity, and impact.</p>
+
+        <ul>
+          <li><strong>Transparent Tracking</strong> — Monitor where each dollar goes from donation to final allocation.</li>
+          <li><strong>Role‑Based Control</strong> — Donors, Operators, Accountants, Auditors, and Admins each have defined permissions to ensure checks and balances.</li>
+          <li><strong>Secure Records</strong> — All transactions, allocations, and disbursements are stored and traceable.</li>
+          <li><strong>Open Accountability</strong> — Audit logs, donation history, and financial flow available to relevant users.</li>
+          <li><strong>User‑Friendly Interface</strong> — Simple to use, whether you’re donating or managing funds.</li>
+        </ul>
+
+        <p>Join us today to help build a transparent, trustworthy donation ecosystem.</p>
+        <button class="btn primary" onclick="showView('home-view')">Go Back to Home</button>
+      </div>
+    </div>
+
+    <div class="view hidden auth-view" id="login-view">
+      <div class="auth-card">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Log in to access your dashboard</p>
+        <div id="login-error" class="error hidden"></div>
+
+        <input id="login-username" class="input" placeholder="Enter your username" />
+        <input id="login-password" class="input" type="password" placeholder="Enter your password" />
+        <button class="btn primary" onclick="login()">Login</button>
+
+        <div class="auth-switch">
+          <span>Don’t have an account?</span>
+          <button class="switch-btn" onclick="showView('signup-view')">Create One</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="view hidden auth-view" id="signup-view">
+      <div class="auth-card">
+        <h1>Create Account</h1>
+        <p class="subtitle">Join our transparent donation community</p>
+        <div id="signup-error" class="error hidden"></div>
+
+        <input id="signup-username" class="input" placeholder="Choose a username" />
+        <input id="signup-email" class="input" placeholder="Enter your email" />
+        <input id="signup-password" class="input" type="password" placeholder="Create a password" />
+        <input id="signup-password2" class="input" type="password" placeholder="Confirm your password" />
+
+        <select id="signup-role" class="input">
+          <option value="" disabled selected>Select your role</option>
+          <option value="Donor">Donor</option>
+          <option value="Operator">Operator</option>
+          <option value="Accountant">Accountant</option>
+          <option value="Auditor">Auditor</option>
+        </select>
+
+        <button class="btn primary" onclick="signup()">Sign Up</button>
+
+        <div class="auth-switch">
+          <span>Already have an account?</span>
+          <button class="switch-btn" onclick="showView('login-view')">Log In</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="view hidden" id="dashboard-view">
+      <nav class="subnav">
+        <h1 id="welcome-text"></h1>
+        <button class="btn logout" onclick="logout()">Logout <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </nav>
+      
+      <main id="dashboard-content">
+        
+        <section id="donor-section" class="panel hidden">
+          <h2><i class="fa-solid fa-hand-holding-dollar"></i> Make a Donation</h2>
+          <div class="action-group">
+            <select id="donor-campaign-select" class="input">
+                <option value="" disabled selected>Select Campaign</option>
+            </select>
+            <input id="donor-donation-amount" class="input" type="number" placeholder="Enter amount (e.g., 50.00)" min="1" step="0.01" />
+            <button class="btn primary" onclick="submitDonation()">Submit Donation</button>
+          </div>
+          <h3>Your Donation History <i class="fa-solid fa-clock-rotate-left"></i></h3>
+          <table id="donor-donations-table" class="table"></table>
+        </section>
+
+        <section id="operator-section" class="panel hidden">
+          
+          <h2><i class="fa-solid fa-bullhorn"></i> Campaign Management</h2>
+          <div class="action-group" style="align-items: flex-end;">
+              <input id="new-campaign-title" class="input" placeholder="New Campaign Title" style="flex: 2;" />
+              <input id="new-campaign-desc" class="input" placeholder="Description" style="flex: 2;" />
+              <input id="new-campaign-enddate" class="input" type="date" placeholder="End Date" style="flex: 1;" />
+              <button class="btn primary small" onclick="createCampaign()">Add Campaign</button>
+          </div>
+          <table id="campaign-table" class="table"></table>
+
+          <h3><i class="fa-solid fa-file-invoice"></i> Donation Verification Queue</h3>
+          <table id="verify-donations-table" class="table"></table>
+          
+          <h3><i class="fa-solid fa-check-to-slot"></i> Allocation Approval (Pending)</h3>
+          <table id="allocation-approval-table" class="table"></table>
+        </section>
+
+        <section id="accountant-section" class="panel hidden">
+          <h2><i class="fa-solid fa-sack-dollar"></i> Record Disbursement</h2>
+          <p>Disburse funds based on **Approved Allocations**.</p>
+          <div class="action-group">
+              <select id="disburse-allocation-select" class="input" style="flex: 2;">
+                  <option value="" disabled selected>Select Approved Allocation (ID - Campaign - Amount)</option>
+              </select>
+              <input id="disburse-tx-ref" class="input" placeholder="Payment Transaction Reference" style="flex: 1;" />
+              <button class="btn primary" onclick="submitDisbursement()">Execute Payment</button>
+          </div>
+
+          <h3><i class="fa-solid fa-receipt"></i> Upload Proof Documents</h3>
+          <div class="action-group">
+              <select id="doc-disbursement-select" class="input" style="flex: 2;">
+                  <option value="" disabled selected>Select Disbursement to attach proof</option>
+              </select>
+              <input id="doc-storage-path" class="input" placeholder="Storage Path / URL" style="flex: 1;" />
+              <input id="doc-file-hash" class="input" placeholder="File Hash (for integrity check)" style="flex: 2;" />
+              <button class="btn primary small" onclick="uploadDocument()">Upload Document Meta</button>
+          </div>
+          
+          <h3><i class="fa-solid fa-users"></i> Receiver Accounts Management</h3>
+          <div class="action-group" style="align-items: flex-end;">
+              <input id="r-name" class="input" placeholder="Receiver Name" style="flex: 2;" />
+              <input id="r-type" class="input" placeholder="Receiver Type (e.g., School/Hospital)" style="flex: 1;" />
+              <input id="r-bank" class="input" placeholder="Bank Account/Wallet ID" style="flex: 2;" />
+              <button class="btn primary small" onclick="createReceiver()">Add Receiver</button>
+          </div>
+          <table id="receiver-table" class="table"></table>
+        </section>
+
+        <section id="auditor-section" class="panel hidden">
+          <h2><i class="fa-solid fa-magnifying-glass-chart"></i> Audit Logs & Financial Flow</h2>
+          
+          <h3>All Allocation Records</h3>
+          <table id="auditor-allocation-table" class="table"></table>
+
+          <h3>All Disbursement Records</h3>
+          <table id="disbursement-table" class="table"></table>
+
+          <h3>System Activity Log (<span style="color: #c63131;">Audit\_Log</span>)</h3>
+          <table id="audit-log-table" class="table"></table>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
